@@ -11,7 +11,7 @@ void main() {
     fragmentColor = vertexColor; 
 }
 `;
-
+//confusion is key
 const fragmentShaderSource = `
 precision mediump float;
 
