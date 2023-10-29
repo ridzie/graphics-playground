@@ -1,7 +1,8 @@
-const { mat4 } = glMatrix;
+const { mat4, vec4 } = glMatrix;
 const toRad = glMatrix.glMatrix.toRadian;
 
 const shapes = [];
+const localAxis = [];
 let gl = null;
 
 const locations = {
@@ -82,54 +83,140 @@ window.onload = async () => {
         // Translate the shape
         shapes[i].translate([xTranslation, yTranslation, 0]);
 
-        // Add the shape to the array
-        //shapes.push(shape);
     }
-
+    
+    let selectedShape = null;
+    
     /* --------- Attach event listener for keyboard events to the window --------- */
     window.addEventListener("keydown", (event) => {
         /* ----- this event contains all the information you will need to process user interaction ---- */
         console.log(event)
         switch (event.key) {
             case 'ArrowUp':
-                mat4.translate(viewMatrix, viewMatrix, [0, 0.1, 0])
+                mat4.translate(viewMatrix, viewMatrix, [0, 0.1, 0]);
                 break;
             case 'ArrowDown':
-                mat4.translate(viewMatrix, viewMatrix, [0, -0.1, 0])
+                mat4.translate(viewMatrix, viewMatrix, [0, -0.1, 0]);
                 break;
             case 'ArrowLeft':
-                mat4.translate(viewMatrix, viewMatrix, [0.1, 0, 0])
+                mat4.translate(viewMatrix, viewMatrix, [0.1, 0, 0]);
                 break;
             case 'ArrowRight':
-                mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0])
+                mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0]);
+                break;
+            case '0':
+                // Select all shapes and move relative to the center of the global coordinate system
+                break;
+            case '1':
+                selectedShape = shapes[0];
+                //shapes[0].drawLine();
+                break;
+            case '2':
+                selectedShape = shapes[1];
+                break;
+            case '3':
+                selectedShape = shapes[2];
+            break;
+            case '4':
+                selectedShape = shapes[3];
+            break;
+            case '5':
+                selectedShape = shapes[4];
+            break;
+            case '6':
+                selectedShape = shapes[5];
+            break;
+            case '7':
+                selectedShape = shapes[6];
+            break;
+            case '8':
+                selectedShape = shapes[7];
+            break;
+            case '9':
+                selectedShape = shapes[8];
+            break;
+            case 'a':
+                selectedShape.scale(0.9); // Decrease width
+            break;
+            case 'A':
+                selectedShape.scale(1.1); // Increase width
+                break;
+            case 'b':
+                selectedShape.scale(0.9, 'height'); // Decrease height
+                break;
+            case 'B':
+                selectedShape.scale(1.1, 'height'); // Increase height
+                break;
+            case 'c':
+                selectedShape.scale(0.9, 'depth'); // Decrease depth
+                break;
+            case 'C':
+                selectedShape.scale(1.1, 'depth'); // Increase depth
+                break;
+            // Rotations
+            case 'i':
+                selectedShape.rotate(10, [1, 0, 0]);
+                break;
+            case 'k':
+                selectedShape.rotate(-10, [1, 0, 0]);
+                break;
+            case 'o':
+                selectedShape.rotate(10, [0, 1, 0]);
+                break;
+            case 'u':
+                selectedShape.rotate(-10, [0, 1, 0]);
+                break;
+            case 'l':
+                selectedShape.rotate(10, [0, 0, 1]);
+                break;
+            case 'j':
+                selectedShape.rotate(-10, [0, 0, 1]);
+                break;
+                
+            // Translations
+            case '>':
+                selectedShape.translate([0.1, 0, 0]); // Move right
+                break;
+            case '<':
+                selectedShape.translate([-0.1, 0, 0]); // Move left
+                break;
+            case '/\\':
+                selectedShape.translate([0, 0.1, 0]); // Move up
+                break;
+            case '\\/':
+                selectedShape.translate([0, -0.1, 0]); // Move down
+                break;
+            case ',':
+                selectedShape.translate([0, 0, 0.1]); // Move forward
+                break;
+            case '.':
+                selectedShape.translate([0, 0, -0.1]); // Move backward
                 break;
             default:
                 break;
         }
-
+        console.log("Key Value: " + event.key);
+        console.log(selectedShape);
     })
 
-
     let isDragging = false;
-    let dragStartX, dragStartY,cameraPositionX=0,cameraPositionY=0;
+    let dragStartX, dragStartY;
+    const mouseDragSpeed = 0.01; 
 
-    // Add a mousedown event listener to start tracking the drag
+    // Mouse Interaction (Click and Drag)
     window.addEventListener('mousedown', (event) => {
         isDragging = true;
         dragStartX = event.clientX;
         dragStartY = event.clientY;
     });
 
-    // Add a mousemove event listener to update the position during the drag
     window.addEventListener('mousemove', (event) => {
         if (isDragging) {
-            const deltaX = event.clientX - dragStartX;
-            const deltaY = event.clientY - dragStartY;
+            const deltaX = (event.clientX - dragStartX) * mouseDragSpeed;
+            const deltaY = (event.clientY - dragStartY) * mouseDragSpeed;
 
-            // Use deltaX and deltaY to update your scene or camera position
-            cameraPositionX += deltaX;
-            cameraPositionY += deltaY;
-            mat4.translate(viewMatrix, viewMatrix, [cameraPositionX*0.1, cameraPositionY*0.1, 0])
+            // Translate the view matrix in the opposite direction (opposite to the drag)
+            mat4.translate(viewMatrix, viewMatrix, [-deltaX, -deltaY, 0]);
 
             // Update the drag start position
             dragStartX = event.clientX;
@@ -137,7 +224,6 @@ window.onload = async () => {
         }
     });
 
-    // Add a mouseup event listener to stop tracking the drag
     window.addEventListener('mouseup', () => {
         isDragging = false;
     });
@@ -168,7 +254,7 @@ function render(now) {
 
     shapes.forEach(shape => {
         /* --------- scale rotation amount by time difference --------- */
-        shape.rotate(1 * delta, [0, 1, 1]);
+        //shape.rotate(1 * delta, [0, 1, 1]);
         shape.draw();
     });
     
@@ -311,4 +397,27 @@ function createCube() {
     cube.initData(vertices, colors)
 
     return cube;
+}
+
+
+function createLocalAxes(){
+    const axisLength = 0.5; // You can adjust the length
+    const vertices = [
+        0, 0, 0, 1,          // Origin
+        axisLength, 0, 0, 1, // X-axis endpoint
+        0, axisLength, 0, 1, // Y-axis endpoint
+        0, 0, axisLength, 1  // Z-axis endpoint
+    ];
+
+    const colors = [
+        [1.0, 0.0, 0.0, 1.0], // X-axis (red)
+        [0.0, 1.0, 0.0, 1.0], // Y-axis (green)
+        [0.0, 0.0, 1.0, 1.0], // Z-axis (blue)
+        [1.0, 1.0, 1.0, 1.0]  // Origin (white)
+    ];
+
+    const localAxis = new Shape();
+    localAxis.initData(vertices, colors);
+
+    return localAxis;
 }
