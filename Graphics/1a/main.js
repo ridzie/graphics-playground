@@ -60,10 +60,12 @@ window.onload = async () => {
         if(i <6)
         {
             shapes.push(createCube());
+            localAxis.push(createLocalAxes());
         }
         else
         {
             shapes.push(createCone());
+            localAxis.push(createLocalAxes());
         }
         //const shape = createCone();
         let xTranslation, yTranslation;
@@ -82,7 +84,7 @@ window.onload = async () => {
 
         // Translate the shape
         shapes[i].translate([xTranslation, yTranslation, 0]);
-
+        localAxis[i].translate([xTranslation, yTranslation, 0]);
     }
     
     let selectedShape = null;
@@ -109,7 +111,6 @@ window.onload = async () => {
                 break;
             case '1':
                 selectedShape = shapes[0];
-                //shapes[0].drawLine();
                 break;
             case '2':
                 selectedShape = shapes[1];
@@ -258,6 +259,13 @@ function render(now) {
         shape.draw();
     });
     
+    
+    localAxis.forEach(shape => {
+        /* --------- scale rotation amount by time difference --------- */
+        //shape.rotate(1 * delta, [0, 1, 1]);
+        shape.draw(0);
+    });
+    
     requestAnimationFrame(render)
 }
 
@@ -399,21 +407,32 @@ function createCube() {
     return cube;
 }
 
+function createLocalAxes() {
+    const length = 0.25;  // Half the length of the axes lines
+    const center = 0.0;  // Center point
 
-function createLocalAxes(){
-    const axisLength = 0.5; // You can adjust the length
     const vertices = [
-        0, 0, 0, 1,          // Origin
-        axisLength, 0, 0, 1, // X-axis endpoint
-        0, axisLength, 0, 1, // Y-axis endpoint
-        0, 0, axisLength, 1  // Z-axis endpoint
+        // X-axis
+        center - length, center, center, 1.0,  // Start point
+        center + length, center, center, 1.0,  // End point
+        // Y-axis
+        center, center - length, center, 1.0,  // Start point
+        center, center + length, center, 1.0,  // End point
+        // Z-axis
+        center, center, center - length, 1.0,  // Start point
+        center, center, center + length, 1.0   // End point
     ];
 
     const colors = [
-        [1.0, 0.0, 0.0, 1.0], // X-axis (red)
-        [0.0, 1.0, 0.0, 1.0], // Y-axis (green)
-        [0.0, 0.0, 1.0, 1.0], // Z-axis (blue)
-        [1.0, 1.0, 1.0, 1.0]  // Origin (white)
+        // X-axis (Red)
+        1.0, 0.0, 0.0, 1.0,  // Red
+        1.0, 0.0, 0.0, 1.0,  // Red
+        // Y-axis (Green)
+        0.0, 1.0, 0.0, 1.0,  // Green
+        0.0, 1.0, 0.0, 1.0,  // Green
+        // Z-axis (Blue)
+        0.0, 0.0, 1.0, 1.0,  // Blue
+        0.0, 0.0, 1.0, 1.0   // Blue
     ];
 
     const localAxis = new Shape();

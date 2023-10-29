@@ -26,7 +26,7 @@ class Shape {
         gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
     }
 
-    draw() {
+    draw(baseShape=1) {
         /* --------- set up attribute arrays --------- */
         Shape.setupAttribute(this.buffers.vertexBuffer, locations.attributes.vertexLocation);
         Shape.setupAttribute(this.buffers.colorBuffer, locations.attributes.colorLocation);
@@ -37,9 +37,17 @@ class Shape {
 
         /* --------- send modelView matrix to GPU --------- */
         gl.uniformMatrix4fv(locations.uniforms.modelViewMatrix, gl.FALSE, modelViewMatrix);
+        
 
+        //1 to use triangles, 0 to use lines
+        if(baseShape!=0){
         /* --------- draw the shape --------- */
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length / 4);
+        }
+        else {
+        /* --------- draw the shape --------- */
+        gl.drawArrays(gl.LINES, 0, this.vertices.length / 4);
+        }
     }
 
     rotate(angle, axis, global = false) {
