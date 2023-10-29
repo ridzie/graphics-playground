@@ -1,6 +1,8 @@
 const { mat4, vec4 } = glMatrix;
 const toRad = glMatrix.glMatrix.toRadian;
 
+let selectedShape = null;
+
 const shapes = [];
 const localAxis = [];
 let gl = null;
@@ -87,7 +89,6 @@ window.onload = async () => {
         localAxis[i].translate([xTranslation, yTranslation, 0]);
     }
     
-    let selectedShape = null;
     
     /* --------- Attach event listener for keyboard events to the window --------- */
     window.addEventListener("keydown", (event) => {
@@ -107,34 +108,35 @@ window.onload = async () => {
                 mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0]);
                 break;
             case '0':
-                // Select all shapes and move relative to the center of the global coordinate system
+                selectedShape = 'all';
                 break;
             case '1':
-                selectedShape = shapes[0];
+                selectedShape = 0;
+                // localAxis[0].draw(0);
                 break;
             case '2':
-                selectedShape = shapes[1];
+                selectedShape = 1;
                 break;
             case '3':
-                selectedShape = shapes[2];
+                selectedShape = 2;
             break;
             case '4':
-                selectedShape = shapes[3];
+                selectedShape = 3;
             break;
             case '5':
-                selectedShape = shapes[4];
+                selectedShape = 4;
             break;
             case '6':
-                selectedShape = shapes[5];
+                selectedShape = 5;
             break;
             case '7':
-                selectedShape = shapes[6];
+                selectedShape = 6;
             break;
             case '8':
-                selectedShape = shapes[7];
+                selectedShape = 7;
             break;
             case '9':
-                selectedShape = shapes[8];
+                selectedShape = 8;
             break;
             case 'a':
                 selectedShape.scale(0.9); // Decrease width
@@ -259,12 +261,17 @@ function render(now) {
         shape.draw();
     });
     
+    if(selectedShape!=null && selectedShape!= 'all'){
+        localAxis[selectedShape].draw(0);
+    }
+    else if (selectedShape == 'all'){
     
     localAxis.forEach(shape => {
         /* --------- scale rotation amount by time difference --------- */
         //shape.rotate(1 * delta, [0, 1, 1]);
         shape.draw(0);
     });
+    }
     
     requestAnimationFrame(render)
 }
