@@ -89,23 +89,33 @@ window.onload = async () => {
         localAxis[i].translate([xTranslation, yTranslation, 0]);
     }
     
-    
+    let cameraMovementEnabled = false;
+
     /* --------- Attach event listener for keyboard events to the window --------- */
     window.addEventListener("keydown", (event) => {
         /* ----- this event contains all the information you will need to process user interaction ---- */
         console.log(event)
         switch (event.key) {
-            case 'ArrowUp':
-                mat4.translate(viewMatrix, viewMatrix, [0, 0.1, 0]);
-                break;
+
+            case ' ':
+            // Toggle camera movement on/off when the 'space' key is pressed
+            cameraMovementEnabled = !cameraMovementEnabled;
+            break;
             case 'ArrowDown':
-                mat4.translate(viewMatrix, viewMatrix, [0, -0.1, 0]);
+                if (cameraMovementEnabled) {
+                mat4.translate(viewMatrix, viewMatrix, [0, 0.1, 0]);}
+                break;
+            case 'ArrowUp':
+                if (cameraMovementEnabled) {
+                mat4.translate(viewMatrix, viewMatrix, [0, -0.1, 0]);}
                 break;
             case 'ArrowLeft':
-                mat4.translate(viewMatrix, viewMatrix, [0.1, 0, 0]);
+                if (cameraMovementEnabled) {
+                mat4.translate(viewMatrix, viewMatrix, [0.1, 0, 0]);}
                 break;
             case 'ArrowRight':
-                mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0]);
+                if (cameraMovementEnabled) {
+                mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0]);}
                 break;
             case '0':
                 selectedShape = 'all';
@@ -139,41 +149,44 @@ window.onload = async () => {
                 selectedShape = 8;
             break;
             case 'a':
-                selectedShape.scale(0.9); // Decrease width
+                // Decrease width
+                shapes[selectedShape].scale([0.9, 1.0, 1.0]);
+                //localAxis[selectedShape].scale([0.9,1,1]);
             break;
             case 'A':
-                selectedShape.scale(1.1); // Increase width
+                shapes[selectedShape].scale([1.1,1,1]);
+                //localAxis[selectedShape].scale([1.1,1,1]); // Increase width
                 break;
             case 'b':
-                selectedShape.scale(0.9, 'height'); // Decrease height
+                shapes[selectedShape].scale([1.0,0.9, 1.0]); // Decrease height
                 break;
             case 'B':
-                selectedShape.scale(1.1, 'height'); // Increase height
+                shapes[selectedShape].scale([1.0, 1.1, 1.0]); // Increase height
                 break;
             case 'c':
-                selectedShape.scale(0.9, 'depth'); // Decrease depth
+                shapes[selectedShape].scale([1.0, 1.0, 0.9]);// Decrease depth
                 break;
             case 'C':
-                selectedShape.scale(1.1, 'depth'); // Increase depth
+                shapes[selectedShape].scale([1.0, 1.0, 1.1]); // Increase depth
                 break;
             // Rotations
             case 'i':
-                selectedShape.rotate(10, [1, 0, 0]);
+                shapes[selectedShape].rotate(-10, [1, 0, 0]);
                 break;
             case 'k':
-                selectedShape.rotate(-10, [1, 0, 0]);
+                shapes[selectedShape].rotate(10, [1, 0, 0]);
                 break;
             case 'o':
-                selectedShape.rotate(10, [0, 1, 0]);
+                shapes[selectedShape].rotate(-10, [0, 1, 0]);
                 break;
             case 'u':
-                selectedShape.rotate(-10, [0, 1, 0]);
+                shapes[selectedShape].rotate(10, [0, 1, 0]);
                 break;
             case 'l':
-                selectedShape.rotate(10, [0, 0, 1]);
+                shapes[selectedShape].rotate(-10, [0, 0, 1]);
                 break;
             case 'j':
-                selectedShape.rotate(-10, [0, 0, 1]);
+                shapes[selectedShape].rotate(10, [0, 0, 1]);
                 break;
                 
             // Translations

@@ -50,6 +50,11 @@ class Shape {
         }
     }
 
+    scale(scaleVector){
+        mat4.scale(this.modelMatrix, this.modelMatrix, scaleVector);
+    }
+
+
     rotate(angle, axis, global = false) {
         /**
          * The transformation functions that glMatrix provides apply the new transformation as the right hand operand,
