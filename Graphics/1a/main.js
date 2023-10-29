@@ -49,27 +49,21 @@ window.onload = async () => {
     /* --------- translate view matrix --------- */
     mat4.translate(viewMatrix, viewMatrix, [-0.5, 0, 0])
 
-    /* --------- create 2 cubes and translate them away from each other --------- 
-    shapes.push(createShape());
-    shapes[0].translate([-0.8, 0.5, 0]);
-
-    shapes.push(createShape());
-    shapes[1].translate([1.8, 0.5, 0]);*/
-
+    //create the 9 shapes and place them on the screen
 
     for (let i = 0; i < 9; i++) {
 
         if(i <6)
         {
-            shapes.push(createCube());
-            localAxis.push(createLocalAxes());
+            shapes.push(createCube()); //creating the shape
+            localAxis.push(createLocalAxes()); //creating its local axis
         }
         else
         {
             shapes.push(createCone());
             localAxis.push(createLocalAxes());
         }
-        //const shape = createCone();
+        
         let xTranslation, yTranslation;
 
         // Define the x and y translations based on the index 'i'
@@ -84,7 +78,7 @@ window.onload = async () => {
             yTranslation = -0.6;
         }
 
-        // Translate the shape
+        // Translate the shapes and axis
         shapes[i].translate([xTranslation, yTranslation, 0]);
         localAxis[i].translate([xTranslation, yTranslation, 0]);
     }
@@ -92,41 +86,100 @@ window.onload = async () => {
     let cameraMovementEnabled = false;
 
     /* --------- Attach event listener for keyboard events to the window --------- */
+    
     window.addEventListener("keydown", (event) => {
-        /* ----- this event contains all the information you will need to process user interaction ---- */
+
         console.log(event)
         switch (event.key) {
 
             case ' ':
-            // Toggle camera movement on/off when the 'space' key is pressed
-            cameraMovementEnabled = !cameraMovementEnabled;
+                // Toggle camera movement on/off when the 'space' key is pressed
+                cameraMovementEnabled = !cameraMovementEnabled;
             break;
             case 'ArrowDown':
                 if (cameraMovementEnabled) {
-                mat4.translate(viewMatrix, viewMatrix, [0, 0.1, 0]);}
-                break;
+                    mat4.translate(viewMatrix, viewMatrix, [0, 0.1, 0]);
+                }
+                else if(selectedShape!=null)
+                {
+                    if(selectedShape =='all')
+                    {
+                        localAllTransform(1,[0, -0.1, 0])
+                    }
+                    else {shapes[selectedShape].translate([0, -0.1, 0]);}
+
+                }
+            break;
             case 'ArrowUp':
-                if (cameraMovementEnabled) {
-                mat4.translate(viewMatrix, viewMatrix, [0, -0.1, 0]);}
-                break;
+                if (cameraMovementEnabled) 
+                {
+                    mat4.translate(viewMatrix, viewMatrix, [0, -0.1, 0]);
+                }
+                else if(selectedShape!=null)
+                {
+                    if(selectedShape =='all')
+                    {
+                        localAllTransform(1,[0, 0.1, 0])
+                    }
+                    else {shapes[selectedShape].translate([0, 0.1, 0]);}
+                }
+            break;
             case 'ArrowLeft':
-                if (cameraMovementEnabled) {
-                mat4.translate(viewMatrix, viewMatrix, [0.1, 0, 0]);}
-                break;
+                if (cameraMovementEnabled) 
+                {
+                    mat4.translate(viewMatrix, viewMatrix, [0.1, 0, 0]);
+                }
+                else if(selectedShape!=null)
+                {
+                    if(selectedShape =='all'){
+                        localAllTransform(1,[-0.1, 0, 0])
+                    }
+                    else {shapes[selectedShape].translate([-0.1, 0, 0]);}
+                }
+            break;
             case 'ArrowRight':
-                if (cameraMovementEnabled) {
-                mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0]);}
-                break;
+                if (cameraMovementEnabled) 
+                {
+                    mat4.translate(viewMatrix, viewMatrix, [-0.1, 0, 0]);
+                }
+                else if(selectedShape!=null)
+                {
+                    if(selectedShape =='all'){
+                        localAllTransform(1,[0.1, 0, 0])
+                    }
+                    else {shapes[selectedShape].translate([0.1, 0, 0]);}
+                }
+            break;
+            case ',':
+                if(selectedShape!=null)
+                {
+                    if(selectedShape =='all'){
+                        localAllTransform(1,[0, 0, 0.1])
+                    }
+                    else 
+                    {shapes[selectedShape].translate([0, 0, 0.1]);} // Move forward
+                }
+            break;
+            case '.':
+                if(selectedShape!=null)
+                {
+                    if(selectedShape =='all'){
+                        localAllTransform(1,[0, 0, -0.1])
+                    }
+                    else 
+                    {shapes[selectedShape].translate([0, 0, -0.1]);} // Move backward
+                } 
+            break;
             case '0':
                 selectedShape = 'all';
-                break;
+            break;
             case '1':
                 selectedShape = 0;
                 // localAxis[0].draw(0);
-                break;
+            break;
             case '2':
                 selectedShape = 1;
-                break;
+            break;
             case '3':
                 selectedShape = 2;
             break;
@@ -149,67 +202,104 @@ window.onload = async () => {
                 selectedShape = 8;
             break;
             case 'a':
-                // Decrease width
-                shapes[selectedShape].scale([0.9, 1.0, 1.0]);
-                //localAxis[selectedShape].scale([0.9,1,1]);
+                if(selectedShape=='all')
+                {localAllTransform(0,[0.9, 1.0, 1.0])}
+                else 
+                {shapes[selectedShape].scale([0.9, 1.0, 1.0]);}  // Decrease width
             break;
             case 'A':
-                shapes[selectedShape].scale([1.1,1,1]);
-                //localAxis[selectedShape].scale([1.1,1,1]); // Increase width
-                break;
+                if(selectedShape=='all')
+                {localAllTransform(0,[1.1,1.0,1.0])}
+                else 
+                {shapes[selectedShape].scale([1.1,1.0,1.0]);} // Increase width
+            break;
             case 'b':
-                shapes[selectedShape].scale([1.0,0.9, 1.0]); // Decrease height
-                break;
+                if(selectedShape=='all')
+                {localAllTransform(0,[1.0,0.9, 1.0])}
+                else 
+                {shapes[selectedShape].scale([1.0,0.9, 1.0]);} // Decrease height
+            break;
             case 'B':
-                shapes[selectedShape].scale([1.0, 1.1, 1.0]); // Increase height
-                break;
+                if(selectedShape=='all')
+                {localAllTransform(0,[1.0, 1.1, 1.0])}
+                else 
+                {shapes[selectedShape].scale([1.0, 1.1, 1.0]);} // Increase height
+            break;
             case 'c':
-                shapes[selectedShape].scale([1.0, 1.0, 0.9]);// Decrease depth
-                break;
+                if(selectedShape=='all')
+                {localAllTransform(0,[1.0, 1.0, 0.9])}
+                else 
+                {shapes[selectedShape].scale([1.0, 1.0, 0.9]);}// Decrease depth
+            break;
             case 'C':
-                shapes[selectedShape].scale([1.0, 1.0, 1.1]); // Increase depth
-                break;
+                if(selectedShape=='all')
+                {localAllTransform(0,[1.0, 1.0, 1.1])}
+                else 
+                {shapes[selectedShape].scale([1.0, 1.0, 1.1]);} // Increase depth
+            break;
             // Rotations
             case 'i':
-                shapes[selectedShape].rotate(-10, [1, 0, 0]);
-                break;
+                if(selectedShape=='all')
+                {
+                    shapes.forEach(shape => 
+                    {
+                        shape.rotate(-10, [1, 0, 0]);
+                    });
+                }
+                else {shapes[selectedShape].rotate(-10, [1, 0, 0]);}
+            break;
             case 'k':
-                shapes[selectedShape].rotate(10, [1, 0, 0]);
-                break;
+                if(selectedShape=='all')
+                {
+                    shapes.forEach(shape => 
+                    {
+                        shape.rotate(-10, [1, 0, 0]);
+                    });
+                }
+                else {shapes[selectedShape].rotate(10, [1, 0, 0]);}
+            break;
             case 'o':
-                shapes[selectedShape].rotate(-10, [0, 1, 0]);
-                break;
+                if(selectedShape=='all')
+                {
+                    shapes.forEach(shape => 
+                    {
+                        shape.rotate(-10, [1, 0, 0]);
+                    });
+                }
+                else {shapes[selectedShape].rotate(-10, [0, 1, 0]);}
+            break;
             case 'u':
-                shapes[selectedShape].rotate(10, [0, 1, 0]);
-                break;
+                if(selectedShape=='all')
+                {
+                    shapes.forEach(shape => 
+                    {
+                        shape.rotate(-10, [1, 0, 0]);
+                    });
+                }
+                else {shapes[selectedShape].rotate(10, [0, 1, 0]);}
+            break;
             case 'l':
-                shapes[selectedShape].rotate(-10, [0, 0, 1]);
-                break;
+                if(selectedShape=='all')
+                {
+                    shapes.forEach(shape => 
+                    {
+                        shape.rotate(-10, [1, 0, 0]);
+                    });
+                }
+                else {shapes[selectedShape].rotate(-10, [0, 0, 1]);}
+            break;
             case 'j':
-                shapes[selectedShape].rotate(10, [0, 0, 1]);
-                break;
-                
-            // Translations
-            case '>':
-                selectedShape.translate([0.1, 0, 0]); // Move right
-                break;
-            case '<':
-                selectedShape.translate([-0.1, 0, 0]); // Move left
-                break;
-            case '/\\':
-                selectedShape.translate([0, 0.1, 0]); // Move up
-                break;
-            case '\\/':
-                selectedShape.translate([0, -0.1, 0]); // Move down
-                break;
-            case ',':
-                selectedShape.translate([0, 0, 0.1]); // Move forward
-                break;
-            case '.':
-                selectedShape.translate([0, 0, -0.1]); // Move backward
-                break;
+                if(selectedShape=='all')
+                {
+                    shapes.forEach(shape => 
+                    {
+                        shape.rotate(-10, [1, 0, 0]);
+                    });
+                }
+                else {shapes[selectedShape].rotate(10, [0, 0, 1]);}
+            break;
             default:
-                break;
+            break;
         }
         console.log("Key Value: " + event.key);
         console.log(selectedShape);
@@ -268,27 +358,29 @@ function render(now) {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    shapes.forEach(shape => {
-        /* --------- scale rotation amount by time difference --------- */
-        //shape.rotate(1 * delta, [0, 1, 1]);
+    shapes.forEach(shape => 
+    {
+        //shape.rotate(1 * delta, [0, 1, 1]);  /* --------- scale rotation amount by time difference --------- */
         shape.draw();
     });
     
+    // this part of the code shows the local axis of the selected object(s)
     if(selectedShape!=null && selectedShape!= 'all'){
         localAxis[selectedShape].draw(0);
     }
-    else if (selectedShape == 'all'){
-    
-    localAxis.forEach(shape => {
-        /* --------- scale rotation amount by time difference --------- */
-        //shape.rotate(1 * delta, [0, 1, 1]);
-        shape.draw(0);
-    });
+    else if (selectedShape == 'all')
+    {
+        localAxis.forEach(shape => 
+        {
+            shape.draw(0);
+        });
     }
     
     requestAnimationFrame(render)
 }
 
+
+//this functions creates a cone
 function createCone() {
     const vertices = [];
     const colors = [];
@@ -347,7 +439,7 @@ function createCone() {
 
     return cone;
 }
-
+//this functions creates a cube
 function createCube() {
     /* --------- define vertex positions & colors --------- */
     /* -------------- 3 vertices per triangle ------------- */
@@ -426,7 +518,7 @@ function createCube() {
 
     return cube;
 }
-
+//this functions creates the local axis for an object
 function createLocalAxes() {
     const length = 0.25;  // Half the length of the axes lines
     const center = 0.0;  // Center point
@@ -459,4 +551,28 @@ function createLocalAxes() {
     localAxis.initData(vertices, colors);
 
     return localAxis;
+}
+
+function localAllTransform(action, vector)
+{
+
+    //0 is for scale
+    //1 is for translate
+    if(selectedShape!=null && selectedShape=='all')
+    {
+       if(action=='1')
+       {
+        shapes.forEach(shape => 
+            {
+                shape.translate(vector);
+            });
+       }
+       else if(action==0)
+       {
+        shapes.forEach(shape => 
+            {
+                shape.scale(vector);
+            });
+       }
+    }
 }
